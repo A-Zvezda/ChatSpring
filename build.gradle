@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.8'
+}
+compileJava.options.encoding = 'UTF-8'
+group 'dev.zvezda'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 11
+
+repositories {
+    mavenCentral()
+}
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.27.2.1'
+   //compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    compile group: 'org.projectlombok', name: 'lombok', version: '1.16.20'
+    //compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+    compile group: 'org.slf4j', name:'slf4j-log4j12', version: '1.7.2'
+    compile group: 'org.slf4j', name:'slf4j-api', version: '1.7.2'
+    compile group: 'org.springframework', name: 'spring', version: '5.2.0.RELEASE', ext: 'pom'
+    compile group: 'org.springframework', name: 'spring-context', version: '5.2.0.RELEASE'
+    compile group: 'org.springframework', name: 'spring-jdbc', version: '5.2.0.RELEASE'
+
+// https://mvnrepository.com/artifact/org.openjfx/javafx
+    compile group: 'org.openjfx', name: 'javafx', version: '11', ext: 'pom'
+
+}
+
+javafx {
+    version = "11"
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
+
+mainClassName = 'client.Main'
+
