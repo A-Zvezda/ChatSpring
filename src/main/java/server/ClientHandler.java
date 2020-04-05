@@ -14,8 +14,9 @@ public class ClientHandler implements Runnable{
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
-    private Main server;
+    private Server server;
     private String nick;
+    private AuthService authService;
     List<String> blackList;
 
     public List<String> getBlackList() {
@@ -30,28 +31,29 @@ public class ClientHandler implements Runnable{
         return blackList.contains(nick);
     }
     public void fillBlackList() {
-        blackList = AuthService.getBlackListByNickName(nick);
+        blackList = authService.getBlackListByNickName(nick);
     }
     public boolean addUserInBlackList(String nick) {
-        String blockUserId =  AuthService.getUserIDbyNick(nick);
-        String currentUserId =  AuthService.getUserIDbyNick(this.nick);
+        String blockUserId =  authService.getUserIDbyNick(nick);
+        String currentUserId =  authService.getUserIDbyNick(this.nick);
         boolean res = false;
         if (blockUserId != null) {
             blackList.add(nick);
-            AuthService.setUserInBlackList(currentUserId,blockUserId);
+            authService.setUserInBlackList(currentUserId,blockUserId);
             res = true;
         }
         return res;
     }
 
 
-    public ClientHandler(Socket socket, Main server) {
+    public ClientHandler(Socket socket, Server server, AuthService authService) {
         try {
             this.blackList = new ArrayList<>();
             this.socket = socket;
             this.server = server;
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
+            this.authService = authService;
             //ExecutorService executorService = Executors.newFixedThreadPool(10);
 
             //executorService.execute(new Runnable() {
@@ -70,8 +72,8 @@ public class ClientHandler implements Runnable{
                 if (str.startsWith("/reg"))
                 {
                     String[] tokens = str.split(" ");
-                    if (AuthService.getLogin(tokens[1]) == null ) {
-                        AuthService.setNewUsers(tokens[1],tokens[2],tokens[3]);
+                    if (authService.getLogin(tokens[1]) == null ) {
+                        authService.setNewUsers(tokens[1],tokens[2],tokens[3]);
                         sendMsg("/regOk");
                     } else {
                         sendMsg("Логин уже используется");
@@ -80,7 +82,7 @@ public class ClientHandler implements Runnable{
                 }
                 if (str.startsWith("/auth")) {
                     String[] tokens = str.split(" ");
-                    String newNick = AuthService.getNickByLoginAndPass(tokens[1], tokens[2]);
+                    String newNick = authService.getNickByLoginAndPass(tokens[1], tokens[2]);
                     if (newNick != null) {
                         if (!server.isNickBusy(newNick)) {
                             sendMsg("/authok" + " " + newNick);
@@ -124,8 +126,8 @@ public class ClientHandler implements Runnable{
                     }
                     if (str.startsWith("/changenick ")){
                         String[] tokens = str.split(" ");
-                        if (!AuthService.nickIsBusy(tokens[1])){
-                            if (AuthService.changeNick(AuthService.getUserIDbyNick(nick), tokens[1])) {
+                        if (!authService.nickIsBusy(tokens[1])){
+                            if (authService.changeNick(authService.getUserIDbyNick(nick), tokens[1])) {
 
                                 sendMsg("Ник усешно сменён!");
                                 server.changeBlackListNewNick(nick,tokens[1]);
