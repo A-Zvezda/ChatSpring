@@ -27,11 +27,8 @@ dependencies {
     compile group: 'org.springframework', name: 'spring', version: '5.2.0.RELEASE', ext: 'pom'
     compile group: 'org.springframework', name: 'spring-context', version: '5.2.0.RELEASE'
     compile group: 'org.springframework', name: 'spring-jdbc', version: '5.2.0.RELEASE'
-
-// https://mvnrepository.com/artifact/org.openjfx/javafx
-    compile group: 'org.openjfx', name: 'javafx', version: '11', ext: 'pom'
-
 }
+
 
 javafx {
     version = "11"

@@ -1,5 +1,6 @@
 package server;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +10,7 @@ public class AuthService {
     private static Connection connection;
     private static Statement stmt;
 
-    public static void connection() {
+    public  AuthService () {
         try {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:mainDB.db");
@@ -19,7 +20,16 @@ public class AuthService {
         }
     }
 
-    public static String getMaxID() {
+    public AuthService(DataSource dataSource) {
+        try {
+            this.connection = dataSource.getConnection();
+            stmt = connection.createStatement();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getMaxID() {
         String sql = String.format("SELECT MAX(id) FROM main");
 
         try {
@@ -37,7 +47,7 @@ public class AuthService {
         return null;
     }
 
-    public static String getUserIDbyNick(String nick) {
+    public  String getUserIDbyNick(String nick) {
         String sql = String.format("SELECT id FROM main where nickname = '%s'", nick);
 
         try {
@@ -55,7 +65,7 @@ public class AuthService {
         return null;
     }
 
-    public static int setUserInBlackList(String userId, String userIdForBlock) {
+    public  int setUserInBlackList(String userId, String userIdForBlock) {
 
         String sql = String.format("INSERT INTO blackList (userId, userIdForBlock) VALUES (%s, %s)", userId, userIdForBlock);
         int rs = 0;
@@ -69,7 +79,7 @@ public class AuthService {
         return rs;
     }
 
-    public static int setNewUsers(String login, String nick, String pass) {
+    public  int setNewUsers(String login, String nick, String pass) {
         int hash = pass.hashCode();
         int maxID =  Integer.parseInt(Objects.requireNonNull(getMaxID())) + 1;
         String sql = String.format("INSERT INTO main (id, login, password, nickname) VALUES (%s,'%s', %s ,'%s')", maxID, login, hash,nick);
@@ -84,7 +94,7 @@ public class AuthService {
         return rs;
     }
 
-    public static List<String> getBlackListByNickName(String nick) {
+    public  List<String> getBlackListByNickName(String nick) {
         List<String> blackList = new ArrayList<>();
         String sql = String.format("SELECT m.nickname\n" +
                 "FROM main \n" +
@@ -105,7 +115,7 @@ public class AuthService {
         return blackList;
     }
 
-    public static boolean changeNick (String userId, String newNick) {
+    public boolean changeNick (String userId, String newNick) {
         boolean res;
         String sql = String.format("UPDATE main SET nickname = '%s'  WHERE id = %s ", newNick, userId);
         int rs = 0;
@@ -123,7 +133,7 @@ public class AuthService {
         return res;
     }
 
-    public static boolean nickIsBusy (String nick) {
+    public boolean nickIsBusy (String nick) {
         String sql = String.format("SELECT Count(nickname) as nickCount FROM main  WHERE nickname = '%s' ", nick);
         int res = 1;
         try {
@@ -140,7 +150,7 @@ public class AuthService {
         return res!=0;
     }
 
-    public static String getNickByLoginAndPass(String login, String pass) {
+    public String getNickByLoginAndPass(String login, String pass) {
         int hash = pass.hashCode();
         String sql = String.format("SELECT nickname FROM main where login = '%s' and password = '%s'", login, hash);
 
@@ -159,7 +169,7 @@ public class AuthService {
         return null;
     }
 
-    public static String getLogin(String login) {
+    public String getLogin(String login) {
         String sql = String.format("SELECT nickname FROM main where login = '%s'", login);
 
         try {
@@ -177,7 +187,7 @@ public class AuthService {
         return null;
     }
 
-    public static void disconnect() {
+    public void disconnect() {
         try {
             connection.close();
         } catch (SQLException e) {
